@@ -1,9 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/prisma/client";
 
-const prisma = new PrismaClient();
+type RouteProps = {
+  params: Promise<{
+    code: string;
+  }>;
+};
 
-export async function GET(_, { params }) {
-  const { code } = params;
+// GET /api/links/[code]
+export async function GET(req: Request, props: RouteProps) {
+  const { code } = await props.params; // ✅ FIX: params is a Promise
 
   const link = await prisma.link.findUnique({
     where: { code },
@@ -18,8 +23,9 @@ export async function GET(_, { params }) {
   return Response.json(link);
 }
 
-export async function DELETE(_, { params }) {
-  const { code } = params;
+// DELETE /api/links/[code]
+export async function DELETE(req: Request, props: RouteProps) {
+  const { code } = await props.params; // ✅ FIX: params is a Promise
 
   try {
     await prisma.link.delete({
@@ -29,7 +35,7 @@ export async function DELETE(_, { params }) {
     return new Response(JSON.stringify({ message: "Deleted" }), {
       status: 200,
     });
-  } catch (e) {
+  } catch (err) {
     return new Response(JSON.stringify({ error: "Not found" }), {
       status: 404,
     });

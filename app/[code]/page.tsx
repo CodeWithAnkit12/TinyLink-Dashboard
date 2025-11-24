@@ -1,9 +1,6 @@
 import { redirect } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/prisma/client";
 
-const prisma = new PrismaClient();
-
-// Correct type for dynamic route params
 type PageProps = {
   params: Promise<{
     code: string;
@@ -11,12 +8,14 @@ type PageProps = {
 };
 
 export default async function RedirectPage({ params }: PageProps) {
-  const { code } = await params; // FIX: params is a Promise
+  // ⛔ FIX: params is a Promise in Next.js 16 → MUST await it
+  const { code } = await params;
 
   if (!code) {
     return <h1>Invalid short code</h1>;
   }
 
+  // Fetch target URL
   const link = await prisma.link.findUnique({
     where: { code },
   });
@@ -34,6 +33,6 @@ export default async function RedirectPage({ params }: PageProps) {
     },
   });
 
-  // Redirect to the long URL
-  redirect(link.long_url);
+  // Redirect
+  return redirect(link.long_url);
 }
