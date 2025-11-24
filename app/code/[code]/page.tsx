@@ -1,14 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import Link from "next/link";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
+import ClickChart from "./chart";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +9,7 @@ export default async function StatsPage({
 }: {
   params: { code: string };
 }) {
-  const code = params.code;
+  const { code } = params;
 
   const data = await prisma.link.findUnique({
     where: { code },
@@ -37,16 +29,10 @@ export default async function StatsPage({
 
   const shortUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/${code}`;
 
-  // Basic chart data (you can expand this later to daily/hourly)
-  const chartData = [
-    { name: "Clicks", value: data.click_count },
-  ];
-
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-10">
       <h1 className="text-4xl font-bold">Analytics</h1>
 
-      {/* Analytics Card */}
       <div className="bg-white shadow rounded-xl p-6 space-y-6">
         <div>
           <p className="text-gray-500 text-sm">Short URL</p>
@@ -90,27 +76,13 @@ export default async function StatsPage({
         </div>
       </div>
 
-      {/* Analytics Chart */}
+      {/* CHART — now client-only */}
       <div className="bg-white p-6 rounded-xl shadow">
         <h2 className="text-xl font-semibold mb-4">Click Analytics</h2>
 
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid stroke="#e5e7eb" />
-            <XAxis dataKey="name" />
-            <YAxis allowDecimals={false} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="value"
-              stroke="#2563eb"
-              strokeWidth={3}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        <ClickChart clicks={data.click_count} />
       </div>
 
-      {/* Buttons */}
       <div className="flex gap-4">
         <Link
           href="/"

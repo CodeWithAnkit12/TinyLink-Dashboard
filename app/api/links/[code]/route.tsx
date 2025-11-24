@@ -1,18 +1,14 @@
 import { prisma } from "@/prisma/client";
-
-type RouteProps = {
-  params: Promise<{
-    code: string;
-  }>;
-};
+import type { NextRequest } from "next/server";
 
 // GET /api/links/[code]
-export async function GET(req: Request, props: RouteProps) {
-  const { code } = await props.params; // ✅ FIX: params is a Promise
+export async function GET(
+  req: NextRequest,
+  context: { params: Promise<{ code: string }> }
+) {
+  const { code } = await context.params;
 
-  const link = await prisma.link.findUnique({
-    where: { code },
-  });
+  const link = await prisma.link.findUnique({ where: { code } });
 
   if (!link) {
     return new Response(JSON.stringify({ error: "Not found" }), {
@@ -24,18 +20,19 @@ export async function GET(req: Request, props: RouteProps) {
 }
 
 // DELETE /api/links/[code]
-export async function DELETE(req: Request, props: RouteProps) {
-  const { code } = await props.params; // ✅ FIX: params is a Promise
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ code: string }> }
+) {
+  const { code } = await context.params;
 
   try {
     await prisma.link.delete({
       where: { code },
     });
 
-    return new Response(JSON.stringify({ message: "Deleted" }), {
-      status: 200,
-    });
-  } catch (err) {
+    return Response.json({ message: "Deleted" });
+  } catch {
     return new Response(JSON.stringify({ error: "Not found" }), {
       status: 404,
     });
