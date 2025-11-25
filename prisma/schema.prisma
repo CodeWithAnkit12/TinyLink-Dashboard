@@ -8,11 +8,10 @@ datasource db {
 }
 
 model Link {
-  id          Int      @id @default(autoincrement())
-  code        String   @unique
-  long_url    String
-  click_count Int      @default(0)
+  id           Int      @id @default(autoincrement())
+  code         String   @unique
+  long_url     String
+  click_count  Int      @default(0)
+  created_at   DateTime @default(now())
   last_clicked DateTime?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
 }
