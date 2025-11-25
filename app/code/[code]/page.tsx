@@ -27,7 +27,7 @@ export default async function StatsPage({
     );
   }
 
-  const shortUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/${code}`;
+const shortUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/${code}`;
 
   return (
     <div className="p-8 max-w-3xl mx-auto space-y-10">
